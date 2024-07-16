@@ -35,5 +35,9 @@ pub enum Commands {
         list_name: Option<String>,
         item_number: Option<usize>,
     },
+    Push,
+    Pull {
+        user_name: String,
+    },
     Exit,
 }

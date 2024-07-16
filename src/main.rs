@@ -1,13 +1,15 @@
 mod cli;
+mod db;
 mod todo;
+mod tests;
 
 use clap::Parser;
 use cli::{Cli, Commands};
 use std::io::{self, Write};
-use todo::{TodoItem, TodoList, User};
+use todo::{TodoList, User};
 
 fn main() {
-    let mut user = User::new("Rajesh Jha".to_string(), "rajesh@example.com".to_string());
+    let mut user = User::new("Raj".to_string(), "rajesh@example.com".to_string());
 
     loop {
         print!("> ");
@@ -84,6 +86,17 @@ fn main() {
                         println!("Invalid remove command. Use --help for more information.");
                     }
                 },
+                Commands::Push => {
+                    if let Err(e) = user.push_to_db() {
+                        println!("Failed to push to db: {}", e);
+                    }
+                }
+                Commands::Pull { user_name } => {
+                    match User::pull_from_db(user_name) {
+                        Ok(pulled_user) => user = pulled_user,
+                        Err(e) => println!("Failed to pull from db: {}", e),
+                    }
+                }
                 Commands::Exit => {
                     println!("Exiting...");
                     break;
