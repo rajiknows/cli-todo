@@ -1,4 +1,4 @@
-use rusqlite::{params, Connection, Result};
+use rusqlite::{Connection, Result};
 
 pub fn establish_connection() -> Result<Connection> {
     let conn = Connection::open("todo.db")?;
@@ -24,13 +24,4 @@ pub fn establish_connection() -> Result<Connection> {
         [],
     )?;
     Ok(conn)
-}
-
-pub fn clear_user_data(conn: &Connection, user_name: &str) -> Result<()> {
-    conn.execute(
-        "DELETE FROM todos WHERE user_id = (SELECT id FROM users WHERE user_name = ?1)",
-        params![user_name],
-    )?;
-    conn.execute("DELETE FROM users WHERE user_name = ?1", params![user_name])?;
-    Ok(())
 }

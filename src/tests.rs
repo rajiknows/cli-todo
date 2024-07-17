@@ -1,14 +1,10 @@
-
-
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use chrono::Local;
-    use crate::db::establish_connection;
-use crate::todo::{TodoItem, TodoList, User};
 
-    use rusqlite::{Connection, Result,params};
-    
+    use crate::todo::User;
+    use chrono::Local;
+
+    use rusqlite::{params, Connection, Result};
 
     fn setup_db() -> Result<Connection> {
         let conn = Connection::open_in_memory()?;
@@ -38,7 +34,10 @@ use crate::todo::{TodoItem, TodoList, User};
 
     #[test]
     fn test_add_todo_list() {
-        let mut user = User::new("test_user".to_string(), "test_email@example.com".to_string());
+        let mut user = User::new(
+            "test_user".to_string(),
+            "test_email@example.com".to_string(),
+        );
         user.add_todo_list("Work".to_string());
 
         assert!(user.todo_lists.contains_key("Work"));
@@ -46,7 +45,10 @@ use crate::todo::{TodoItem, TodoList, User};
 
     #[test]
     fn test_add_todo_item() {
-        let mut user = User::new("test_user".to_string(), "test_email@example.com".to_string());
+        let mut user = User::new(
+            "test_user".to_string(),
+            "test_email@example.com".to_string(),
+        );
         user.add_todo_list("Work".to_string());
         let todo_list = user.get_todo_list(&"Work".to_string()).unwrap();
 
@@ -58,7 +60,10 @@ use crate::todo::{TodoItem, TodoList, User};
 
     #[test]
     fn test_mark_complete() {
-        let mut user = User::new("test_user".to_string(), "test_email@example.com".to_string());
+        let mut user = User::new(
+            "test_user".to_string(),
+            "test_email@example.com".to_string(),
+        );
         user.add_todo_list("Work".to_string());
         let todo_list = user.get_todo_list(&"Work".to_string()).unwrap();
 
@@ -70,7 +75,10 @@ use crate::todo::{TodoItem, TodoList, User};
 
     #[test]
     fn test_mark_incomplete() {
-        let mut user = User::new("test_user".to_string(), "test_email@example.com".to_string());
+        let mut user = User::new(
+            "test_user".to_string(),
+            "test_email@example.com".to_string(),
+        );
         user.add_todo_list("Work".to_string());
         let todo_list = user.get_todo_list(&"Work".to_string()).unwrap();
 
@@ -83,7 +91,10 @@ use crate::todo::{TodoItem, TodoList, User};
 
     #[test]
     fn test_remove_item() {
-        let mut user = User::new("test_user".to_string(), "test_email@example.com".to_string());
+        let mut user = User::new(
+            "test_user".to_string(),
+            "test_email@example.com".to_string(),
+        );
         user.add_todo_list("Work".to_string());
         let todo_list = user.get_todo_list(&"Work".to_string()).unwrap();
 
@@ -96,14 +107,19 @@ use crate::todo::{TodoItem, TodoList, User};
     #[test]
     fn test_push_to_db() {
         let conn = setup_db().unwrap();
-        let mut user = User::new("test_user".to_string(), "test_email@example.com".to_string());
+        let mut user = User::new(
+            "test_user".to_string(),
+            "test_email@example.com".to_string(),
+        );
         user.add_todo_list("Work".to_string());
         let todo_list = user.get_todo_list(&"Work".to_string()).unwrap();
 
         todo_list.add("Complete report".to_string());
         user.push_to_db().unwrap();
 
-        let mut stmt = conn.prepare("SELECT user_name, email FROM users WHERE user_name = ?1").unwrap();
+        let mut stmt = conn
+            .prepare("SELECT user_name, email FROM users WHERE user_name = ?1")
+            .unwrap();
         let mut rows = stmt.query(params!["test_user"]).unwrap();
         assert!(rows.next().unwrap().is_some());
 
@@ -120,13 +136,16 @@ use crate::todo::{TodoItem, TodoList, User};
         conn.execute(
             "INSERT INTO users (user_name, email) VALUES (?1, ?2)",
             params![user_name, email],
-        ).unwrap();
+        )
+        .unwrap();
 
-        let user_id: i64 = conn.query_row(
-            "SELECT id FROM users WHERE user_name = ?1",
-            params![user_name],
-            |row| row.get(0),
-        ).unwrap();
+        let user_id: i64 = conn
+            .query_row(
+                "SELECT id FROM users WHERE user_name = ?1",
+                params![user_name],
+                |row| row.get(0),
+            )
+            .unwrap();
 
         conn.execute(
             "INSERT INTO todos (user_id, list_name, item_number, title, datetime, is_completed) VALUES (?1, ?2, ?3, ?4, ?5, ?6)",

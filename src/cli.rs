@@ -39,5 +39,10 @@ pub enum Commands {
     Pull {
         user_name: String,
     },
+    Login {
+        user_name: String,
+        email: String,
+    },
+    Logout,
     Exit,
 }

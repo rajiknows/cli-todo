@@ -1,4 +1,4 @@
-use crate::db::{establish_connection};
+use crate::db::establish_connection;
 use chrono::prelude::*;
 use rusqlite::{params, Result};
 use std::collections::HashMap;
@@ -178,20 +178,19 @@ impl User {
 
     pub fn push_to_db(&self) -> Result<()> {
         let conn = establish_connection()?;
-        
-        // Insert user if not exists
+
         conn.execute(
             "INSERT OR IGNORE INTO users (user_name, email) VALUES (?1, ?2)",
             params![self.user_name, self.email],
         )?;
-        
+
         // Get the user ID
         let user_id: i64 = conn.query_row(
             "SELECT id FROM users WHERE user_name = ?1",
             params![self.user_name],
             |row| row.get(0),
         )?;
-        
+
         for (list_name, list) in &self.todo_lists {
             for todo in &list.todos {
                 if todo.is_deleted {
@@ -256,7 +255,6 @@ impl User {
         })?;
 
         for todo in todo_iter {
-
             let (list_name, todo) = todo?;
 
             user.todo_lists
