@@ -1,7 +1,12 @@
 use rusqlite::{Connection, Result};
+use dotenv::dotenv;
+use std::env;
+
 
 pub fn establish_connection() -> Result<Connection> {
-    let conn = Connection::open("todo.db")?;
+    dotenv().ok();
+    let url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let conn = Connection::open(url)?;
     conn.execute(
         "CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY,
